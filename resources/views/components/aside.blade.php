@@ -4,7 +4,7 @@
     <div class="h-full px-3 pb-4 overflow-y-auto bg-primary">
         <ul class="space-y-2 font-medium">
             <li>
-                <a href="/" class="flex items-center p-2 text-white rounded-lg hover:bg-secondary group">
+                <a href="{{ route('pemain.index') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-secondary group">
                     <svg class=" w-5 h-5 text-white transition duration-75 group-hover:text-secondary" viewBox="0 0 24 24"
                         fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -19,7 +19,7 @@
                 </a>
             </li>
             <li>
-                <a href="/training" class="flex items-center p-2 text-white rounded-lg hover:bg-secondary group">
+                <a href="{{ route('pemain.create') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-secondary group">
                     <svg class="flex-shrink-0 w-5 h-5 text-white transition duration-75 group-hover:text-secondary"
                         height="200px" width="200px" version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg"
                         xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve"

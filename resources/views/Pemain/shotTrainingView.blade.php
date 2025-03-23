@@ -1,80 +1,53 @@
 <x-layout>
 
+
     <!-- SECTION DESKTOP -->
-    <div class="hidden md:flex items-center justify-between">
-        <h1 class="text-4xl font-extrabold text-white tracking-tight md:text-5xl lg:text-6xl">
-            Shot Training
-        </h1>
-        <div>
-            <a href="#"
-                class="block max-w-sm p-6 bg-primary border border-gray-200 rounded-lg shadow-sm">
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex items-center justify-between">
+            <h1 class="text-4xl font-extrabold text-white tracking-tight md:text-5xl lg:text-6xl">
+                Welcome to <br> <span class="text-grafik">MyShotTracker</span>
+            </h1>
+        </div>
 
-                <!-- Header Card -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h5 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                            Shot Progress
-                        </h5>
-                        <p class="font-normal text-gray-700 dark:text-gray-400">
-                            Shot progress in a week
-                        </p>
-                    </div>
+        <!-- My History Section -->
+        <div class="flex flex-col md:flex-row items-center justify-between mt-8 mb-6 gap-4">
+            <!-- Title -->
+            <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight text-white">
+                My History
+            </h1>
 
-                    <button type="button"
-                        class="text-black ml-5 bg-grafik focus:ring-4 focus:outline-none
-                     font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
-                        See Detail
-                        <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            <!-- Filter Section -->
+            <div class="flex flex-col md:flex-row items-center gap-2 md:gap-4">
+                <h1 class="text-white text-sm md:text-2xl tracking-tight font-bold">
+                    Filter by Date:
+                </h1>
+
+
+                <div class="relative max-w-sm">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
                         </svg>
-                    </button>
+                    </div>
+                    <input id="datepicker-autohide" datepicker datepicker-autohide type="text"
+                        class="bg-black border border-gray-300 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
+                        placeholder="Select date">
                 </div>
-            </a>
+
+
+
+            </div>
+        </div>
+
+
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            @foreach ($overallShot as $overallShot)
+                <x-shot-training-card :overallShot="$overallShot"></x-shot-training-card>
+            @endforeach
         </div>
     </div>
 
-    <!-- SECTION MOBILE -->
-    <div class="flex md:hidden flex-col items-center text-center p-6 space-y-4">
-        <h1 class="text-3xl text-white font-extrabold tracking-tight ">
-            Shot Training
-        </h1>
-        <a href="#"
-            class="block w-full p-6 bg-primary border border-gray-200 rounded-lg shadow-sm">
 
-            <div class="flex flex-col items-center">
-                <h5 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                    Shot Progress
-                </h5>
-                <p class="font-normal text-gray-700 dark:text-gray-400">
-                    Shot progress in a week
-                </p>
-            </div>
-
-            <button type="button"
-                class="mt-4 w-full text-black bg-grafik hover:bg-blue-800 focus:ring-4 focus:outline-none
-             font-medium rounded-lg text-sm px-5 py-2.5 flex items-center justify-center gap-x-2">
-                See Detail
-                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 14 10">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M1 5h12m0 0L9 1m4 4L9 9" />
-                </svg>
-            </button>
-
-        </a>
-    </div>
-
-
-
-
-    <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-white md:text-4xl lg:text-4xl">My
-        History
-    </h1>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 justify-center place-items-center">
-        <x-shot-training-card></x-shot-training-card>
-        <x-shot-training-card></x-shot-training-card>
-        <x-shot-training-card></x-shot-training-card>
-    </div>
 </x-layout>

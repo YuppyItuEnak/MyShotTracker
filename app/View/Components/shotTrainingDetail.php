@@ -6,18 +6,14 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class shotTrainingCard extends Component
+class shotTrainingDetail extends Component
 {
     /**
      * Create a new component instance.
      */
-
-     public $overallShot;
-    //  public $shotTraining;
-
-    public function __construct($overallShot)
+    public function __construct()
     {
-        $this->overallShot = $overallShot;
+        //
     }
 
     /**
@@ -25,6 +21,6 @@ class shotTrainingCard extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.shot-training-card');
+        return view('components.shot-training-detail');
     }
 }
