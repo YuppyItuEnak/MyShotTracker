@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('overall_shots', function (Blueprint $table) {
+        Schema::create('training_counts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('totalmade');
-            $table->integer('totalattempt');
-            $table->double('totalaccuracy', 5, 2);
-            $table->date('date');
+            $table->integer('training_count')->default(0);
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('overall_shots');
+        Schema::dropIfExists('training_counts');
     }
 };

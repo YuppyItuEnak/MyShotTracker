@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('shotmade');
             $table->integer('attempt');
             // $table->time('duration');
-            $table->enum('location', ['Right Corner', 'Left Corner', 'Top', 'Right Wing', 'Left Wing', 'Top Of The Key', 'Right Short Corner', 'Left Short Corner', 'Right Elbow', 'Left Elbow']);
+            $table->enum('location', ['Right Corner', 'Left Corner', 'Top', 'Right Wing', 'Left Wing',  'Right Short Corner', 'Left Short Corner', 'Right Elbow', 'Left Elbow', 'Top Of The Key']);
             $table->double('accuracy', 5, 2);
             $table->timestamps();
         });

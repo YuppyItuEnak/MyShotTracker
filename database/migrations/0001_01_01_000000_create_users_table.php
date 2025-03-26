@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
+            // $table->foreignId('user_id')->after('id')->constrained()->onDelete('cascade');
             $table->id();
+            $table->string('image')->nullable();
             $table->string('name');
             $table->string('email')->unique();
             $table->enum('role', ['Pemain','Pelatih'])->default('Pemain');

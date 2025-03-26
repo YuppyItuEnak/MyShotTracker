@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -17,11 +18,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $fillable = ['image', 'role', 'name', 'email', 'password'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -32,6 +29,16 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function overallShots()
+    {
+        return $this->hasMany(OverallShot::class, 'user_id');
+    }
+
+    public function trainingCount()
+    {
+        return $this->hasOne(TrainingCount::class, 'user_id');
+    }
 
     /**
      * Get the attributes that should be cast.

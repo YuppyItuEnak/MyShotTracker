@@ -36,6 +36,8 @@
                     @method('POST')
                     @csrf
 
+                    <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
+
                     <!-- Date Input -->
                     <div class="mb-4">
                         <label class="block text-sm mb-2 text-white" for="date">Date:</label>

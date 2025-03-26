@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class shotTrainingDetail extends Component
+class PelatihAside extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class shotTrainingDetail extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.shot-training-detail');
+        return view('components.pelatih-aside');
     }
 }

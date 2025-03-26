@@ -36,7 +36,10 @@
     <img src="halfcourt.jpg" alt="Court Image" class="w-full mt-3 rounded-lg">
 
     <!-- Button -->
-    <button class="w-full mt-4 bg-grafik text-black font-bold py-2 rounded-lg hover:bg-green-500 transition">
-        See Detail
-    </button>
+
+        <a href="{{ route('pemain.show', ['id' => $overallShot->id]) }}"
+            class="w-full mt-4 bg-grafik text-black text-center font-bold py-2 rounded-lg hover:bg-green-400 transition">
+            See Detail
+        </a>
+
 </div>
