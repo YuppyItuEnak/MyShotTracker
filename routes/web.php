@@ -10,30 +10,35 @@ use Illuminate\Support\Facades\Route;
 //     return view('Pemain.shotTrainingView');
 // });
 
-Route::get('/Dashboard', function () {
-    return view('Pelatih.Dashboard');
-});
-Route::get('/login', function () {
-    return view('Login');
-});
+// Route::get('/Dashboard', function () {
+//     return view('Pelatih.Dashboard');
+// });
+// Route::get('/login', function () {
+//     return view('Login');
+// });
 
-Route::get('/signup', function () {
-    return view('SignUp');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+
 
 // Route::resource('pemain', shotTrainingController::class);
 
+
+
 //  Routing untuk user Pemain
-Route::get('/', [shotTrainingController::class, 'index'])->name('pemain.index');
+Route::get('/index', [shotTrainingController::class, 'index'])->name('pemain.index');
 Route::get('/create', [shotTrainingController::class, 'create'])->name('pemain.create');
 Route::post('/store', [shotTrainingController::class, 'store'])->name('pemain.store');
 Route::get('/detail/{id}', [shotTrainingController::class, 'show'])->name('pemain.show');
 Route::get('/report', [shotTrainingController::class, 'reportProgress'])->name('pemain.reportProgress');
 
-Route::get('/signup', [UserController::class, 'create'])->name('signup');
+Route::get('/', [UserController::class, 'create'])->name('signup');
 Route::get('/login', [UserController::class, 'logincreate'])->name('login');
 Route::post('/users', [UserController::class, 'store'])->name('users.store');
 Route::post('/userlogin', [UserController::class, 'login'])->name('login.store');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 
 

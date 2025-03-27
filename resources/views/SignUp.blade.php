@@ -77,7 +77,7 @@
                             Up</button>
 
                         <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                            Have an account? <a href="#"
+                            Have an account? <a href="{{ route('login') }}"
                                 class="font-medium text-primary-600 hover:underline dark:text-primary-500">Login</a>
                         </p>
                     </form>

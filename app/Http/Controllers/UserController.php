@@ -85,6 +85,14 @@ class UserController extends Controller
         return response()->json(['message' => 'Email atau password salah!'], 401);
     }
 
+    public function logout(Request $request)
+    {
+        Auth::logout(); // Logout user yang sedang login
+        $request->session()->invalidate(); // Hapus session
+        $request->session()->regenerateToken(); // Regenerasi CSRF token untuk keamanan
+
+        return redirect()->route('login')->with('success', 'Anda telah logout!');
+    }
     /**
      * Display the specified resource.
      */

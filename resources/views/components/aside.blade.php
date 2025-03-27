@@ -80,38 +80,6 @@
                     <span class="flex-1 ms-3 whitespace-nowrap">Reports Card</span>
                 </a>
             </li>
-            <li>
-                <a href="{{ route('login') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-secondary group">
-                    <svg class="flex-shrink-0 w-5 h-5 text-white transition duration-75 group-hover:text-secondary"
-                        fill="#ffffff" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier">
-                            <title>login</title>
-                            <path
-                                d="M12.219 26.156h6.094c1.156 0 2.125-0.406 2.875-1.188 0.75-0.75 1.219-1.75 1.219-2.875v-12.219c0-1.125-0.469-2.125-1.219-2.875s-1.75-1.188-2.875-1.188h-6.094v2.563h6.094c0.875 0 1.531 0.656 1.531 1.5v12.219c0 0.844-0.656 1.531-1.531 1.531h-6.094v2.531zM0 13.563v4.875c0 0.563 0.469 1.031 1.031 1.031h5.688v3.844c0 0.344 0.156 0.625 0.469 0.781 0.125 0.031 0.281 0.031 0.344 0.031 0.219 0 0.406-0.063 0.563-0.219l7.344-7.344c0.281-0.281 0.25-0.844 0-1.156l-7.344-7.313c-0.25-0.25-0.563-0.281-0.906-0.188-0.313 0.156-0.469 0.406-0.469 0.75v3.875h-5.688c-0.563 0-1.031 0.469-1.031 1.031z">
-                            </path>
-                        </g>
-                    </svg>
-                    <span class="flex-1 ms-3 whitespace-nowrap">Login</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('signup') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-secondary group">
-                    <svg class="flex-shrink-0 w-5 h-5 text-white transition duration-75 group-hover:text-secondary" fill="#ffffff" height="200px" width="200px" version="1.1" id="Capa_1"
-                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                        viewBox="0 0 310 310" xml:space="preserve">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier">
-                            <path
-                                d="M300.606,159.727l-45.333-45.333c-5.857-5.858-15.355-5.858-21.213,0L225,123.454V15c0-8.284-6.716-15-15-15H20 C11.716,0,5,6.716,5,15v240.002c0,8.284,6.716,15,15,15h85V295c0,8.284,6.716,15,15,15h45.333c3.979,0,7.794-1.581,10.607-4.394 l124.667-124.667C306.465,175.081,306.465,165.585,300.606,159.727z M35,30h160v123.454l-85.606,85.605 c-0.302,0.301-0.581,0.619-0.854,0.942H35V30z M159.12,280H135v-24.121l109.667-109.666l24.12,24.12L159.12,280z">
-                            </path>
-                        </g>
-                    </svg>
-                    <span class="flex-1 ms-3 whitespace-nowrap">Sign Up</span>
-                </a>
-            </li>
         </ul>
     </div>
 </aside>

@@ -17,15 +17,17 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $trainingCounts = TrainingCount::all();
 
-        $pemain = User::where('role', 'pemain')->first();
-        $overallShot = OverallShot::where('user_id', $pemain->id)->get();
-        // Debugging
+        $players = User::where('role', 'pemain')->with(['overallShots'])->get(); // Ambil semua pemain
+
+        // Ambil OverallShot per pemain
+        // $overallShot = OverallShot::whereIn('user_id', $players->pluck('id'))
+        //     ->get()
+        //     ->groupBy('user_id'); // Kelompokkan berdasarkan user_id
+        // $overallShot = OverallShot::where('user_id', $players->id)->get();
         // dd($overallShot);
 
-
-        return view('Pelatih.Dashboard', compact('trainingCounts', 'overallShot'));
+        return view('Pelatih.Dashboard', compact('players'));
     }
 
 
@@ -53,32 +55,56 @@ class DashboardController extends Controller
     //Memanggil Id untuk overallshot
     public function show(string $id)
     {
-        $overallShot = OverallShot::findOrFail($id);
+        $user = User::find($id);
 
-        $allShots = OverallShot::where('user_id', $overallShot->user_id)
-        ->orderBy('date', 'ASC')
-        ->get(['date', 'totalaccuracy']);
+        if (!$user) {
+            return redirect()->back()->with('error', 'User tidak ditemukan.');
+        }
 
-    // Kelompokkan data berdasarkan minggu
-    $weeks = [];
-    foreach ($allShots as $shot) {
-        $weekNumber = \Carbon\Carbon::parse($shot->date)->format('W'); // Ambil minggu dari tanggal
-        $weeks[$weekNumber][] = [
-            'label' => \Carbon\Carbon::parse($shot->date)->format('d M'),
-            'value' => $shot->totalaccuracy
-        ];
-    }
+        $overallShot = OverallShot::where('user_id', $id)->get();
+        // dd($overallShot);
 
-        return view('Pelatih.DetailPlayer', compact('overallShot', 'weeks'));
+        $trainingcount = TrainingCount::where('user_id', $id)->first();
+        $trainingcount = $trainingcount->training_count;
+        // dd($trainingcount);
+
+        $weeks = [];
+        $currentWeek = [];
+        $weekCounter = 1;
+
+        foreach ($overallShot as $index => $shot) {
+            $date = Carbon::parse($shot->date);
+
+            // Jika sudah 7 hari dalam satu minggu, buat minggu baru
+            if (count($currentWeek) >= 7) {
+                $weeks["Week $weekCounter"] = $currentWeek; // Simpan minggu sebelumnya
+                $weekCounter++;
+                $currentWeek = []; // Reset minggu baru
+            }
+
+            // Tambahkan data ke minggu yang sedang berjalan
+            $currentWeek[] = [
+                'label' => $date->format('M d'),
+                'value' => $shot->totalaccuracy
+            ];
+        }
+
+        if (!empty($currentWeek)) {
+            $weeks["Week $weekCounter"] = $currentWeek;
+        }
+
+        return view('Pelatih.DetailPlayer', compact('weeks', 'user', 'overallShot', 'trainingcount'));
     }
 
     //Memanggil id untuk shotTraining
     public function showDetailShot(string $id)
     {
         $overallShot = OverallShot::findOrFail($id);
-        $shotTraining = ShotTraining::where('overall_shot_id', $overallShot->id ?? null)->get();
+        // dd($overallShot);
+        $shotTraining = ShotTraining::where('overall_shot_id', $id)->get();
+
         // dd($shotTraining);
-        return view('Pelatih.DetailShotPlayer', compact('overallShot', 'shotTraining'));
+        return view('Pelatih.DetailShotPlayer', compact('shotTraining', 'overallShot'));
     }
 
     public function reportPlayerProgress()

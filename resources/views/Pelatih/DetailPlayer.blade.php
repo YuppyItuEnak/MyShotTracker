@@ -1,4 +1,41 @@
 <x-pelatih-layout>
+    <a href="javascript:history.back()"
+        class="inline-flex items-center px-4 py-2 mb-5 text-sm font-medium text-black bg-grafik rounded-lg shadow-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back
+    </a>
+
+
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-5">
+        <!-- Bagian Kiri: Profil Pemain -->
+        <div class="flex flex-col md:flex-row gap-6 items-center text-center md:text-left">
+            <img class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover"
+                src="{{ asset('storage/' . $user->image) }}" alt="">
+
+            <div class="flex flex-col">
+                <h1 class="text-lg md:text-xl font-extrabold text-white tracking-tight mb-2 md:mb-5">
+                    {{ $user->name }}
+                </h1>
+                <h1 class="text-sm md:text-lg font-extrabold text-white tracking-tight">
+                    {{ $user->email }}
+                </h1>
+            </div>
+        </div>
+
+        <!-- Bagian Kanan: Training Count -->
+        <div class="border border-secondary p-4 bg-primary flex flex-col justify-center items-center w-full md:w-auto">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-center text-white tracking-tight">
+                {{ $trainingcount }}
+            </h1>
+            <h1 class="text-sm md:text-lg font-extrabold text-center text-grafik tracking-tight">
+                Training Count
+            </h1>
+        </div>
+    </div>
+
     <div class="w-full h-auto sm:h-[250px] md:h-[300px] border rounded">
         <canvas class="p-4" id="progressChart"></canvas>
     </div>
@@ -15,87 +52,44 @@
         </div>
     </div>
 
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg ">
-        <table class="w-full text-sm text-left rtl:text-right  text-gray-500 dark:text-gray-400">
-            <thead
-                class="text-xs text-gray-700 text-center uppercase bg-primary border-secondary dark:bg-primary dark:border-secondary dark:text-gray-400">
+
+
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                    <th scope="col" class="p-4">
-                        Id
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Date
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Shooting Around
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Total Shot Made
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Total Attempt
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Total Accuracy
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Action
-                    </th>
+                    <th scope="col" class="px-4 py-3 md:px-6">Date</th>
+                    <th scope="col" class="px-4 py-3 md:px-6">Shooting Around</th>
+                    <th scope="col" class="px-4 py-3 md:px-6">Total Shot Made</th>
+                    <th scope="col" class="px-4 py-3 md:px-6">Total Attempt</th>
+                    <th scope="col" class="px-4 py-3 md:px-6">Total Accuracy</th>
+                    <th scope="col" class="px-4 py-3 md:px-6 text-center">Action</th>
                 </tr>
             </thead>
             <tbody>
-
-                <tr
-                    class="bg-white border-b text-center dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <th scope="col" class="p-4">
-                        {{ $overallShot->id }}
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        {{ $overallShot->date }}
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Shooting Around
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        {{ $overallShot->totalmade }}
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        {{ $overallShot->totalattempt }}
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        <div class="flex flex-col items-center mt-5">
-                            <div class="relative w-24 h-24">
-                                <svg class="w-24 h-24" viewBox="0 0 36 36">
-                                    <circle cx="18" cy="18" r="16" stroke="gray" stroke-width="4"
-                                        fill="none" />
-                                    <circle cx="18" cy="18" r="16" stroke="#a3e635" stroke-width="4"
-                                        fill="none" stroke-dasharray="100, 100"
-                                        stroke-dashoffset="{{ 100 - $overallShot->totalaccuracy }}"></circle>
-                                </svg>
-                                <span
-                                    class="absolute inset-0 flex flex-col items-center justify-center text-white font-bold text-lg">
-                                    {{ $overallShot->totalaccuracy }}%
-                                    <span class="text-sm text-gray-300">Overall</span>
-                                </span>
-                            </div>
-                        </div>
-                    </th>
-                    <td class="flex items-center px-6 py-4">
-                        {{-- @foreach ($shotTraining as $shot) --}}
-                        <a href="{{ route('pelatih.showDetailShot', ['id' => $overallShot->id]) }}"
-                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                            View Detail
-                        </a>
-                        {{-- @endforeach --}}
-                        <a href="#"
-                            class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
-                    </td>
-                </tr>
-
-
+                @foreach ($overallShot as $shot)
+                    <tr
+                        class="odd:bg-white even:bg-gray-50 text-center items-center dark:odd:bg-gray-900 dark:even:bg-gray-800 border-b dark:border-gray-700 border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <td class="px-4 py-3 md:px-6">{{ $shot->date }}</td>
+                        <th scope="row"
+                            class="px-4 py-3 md:px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            Shooting Around
+                        </th>
+                        <td class="px-4 py-3 md:px-6">{{ $shot->totalmade }}</td>
+                        <td class="px-4 py-3 md:px-6">{{ $shot->totalattempt }}</td>
+                        <td class="px-4 py-3 md:px-6">{{ $shot->totalaccuracy }}</td>
+                        <td class="px-4 py-3 md:px-6 text-center">
+                            <a href="{{ route('pelatih.showDetailShot', $shot->id) }}"
+                                class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View Detail</a>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
+
+
+
 
 
 

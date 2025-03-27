@@ -1,24 +1,23 @@
 <x-pelatih-layout>
-    <h1 class="text-4xl font-bold italic text-whitemb-20 tracking-ligt">
-        Welcome back, {{ auth()->user()->name }} <br>
-        <span class="text-gray-500 whitespace-normal text-xl dark:text-gray-400">Welcome to dashboard</span>
-    </h1>
 
 
-    <h1 class="text-4xl font-bold italic text-white mb-5">Dashboard <span class="text-grafik">Player Training Progress</span></h1>
+
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg ">
         <table class="w-full text-sm text-left rtl:text-right  text-gray-500 dark:text-gray-400">
             <thead
-                class="text-xs text-gray-700 uppercase bg-primary border-secondary dark:bg-primary dark:border-secondary dark:text-gray-400">
+                class="text-xs text-gray-700 text-center uppercase bg-secondary border-secondary dark:bg-secondary dark:border-secondary dark:text-gray-400">
                 <tr>
                     <th scope="col" class="p-4">
-                        Id
+                        No
                     </th>
                     <th scope="col" class="px-6 py-3">
-                        Player name
+                        User Image
                     </th>
                     <th scope="col" class="px-6 py-3">
-                        Total Training
+                        User Name
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Role
                     </th>
                     <th scope="col" class="px-6 py-3">
                         Action
@@ -26,32 +25,37 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($trainingCounts as $training)
+
+                @foreach ($players  as $index => $player)
                     <tr
-                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        class="bg-primary border-b text-center dark:bg-primary dark:border-secondary border-secondary hover:bg-gray-50 dark:hover:bg-gray-600">
                         <th scope="col" class="p-4">
-                            {{ $training->id }}
+                            {{ $index + 1 }}
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            {{ $training->user->name }}
+                            <div class="flex justify-center items-center ">
+                                    <img src="{{ asset('storage/' . $player->image) }}" alt="Profile Picture"
+                                        class="w-20 h-20  rounded-full object-cover">
+                                </div>
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            {{ $training->training_count }}
+                            {{ $player->name }}
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-grafik">
+                            {{ $player->role }}
                         </th>
 
-                        <td class="flex items-center px-6 py-4">
-                            @foreach ($overallShot as $shot)
-                                <a href="{{ route('pelatih.show', ['id' => $shot->id]) }}"
-                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View Detail</a>
-                            @endforeach
-                            <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
-                        </td>
 
+                        <th class="px-6 py-4">
+                            <a href="{{ route('pelatih.show', ['id' => $player->id]) }}" class="font-medium text-grafik dark:text-grafik hover:underline">
+                                    View Detail
+                                </a>
+                        </th>
                     </tr>
                 @endforeach
-
             </tbody>
         </table>
     </div>
+
 
 </x-pelatih-layout>

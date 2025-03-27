@@ -19,6 +19,7 @@ class shotTrainingController extends Controller
     public function index()
     {
         $overallShot = OverallShot::where('user_id', Auth::user()->id)->get();
+        
         // $shotTraining = ShotTraining::all();
         return view('Pemain.shotTrainingView', compact('overallShot'));
     }
@@ -123,8 +124,7 @@ class shotTrainingController extends Controller
 
     public function reportProgress()
     {
-        $overallShot = OverallShot::orderBy('date', 'asc')->get();
-
+        $overallShot = OverallShot::where('user_id', Auth::user()->id)->get();
         $weeks = [];
         $currentWeek = [];
         $weekCounter = 1;

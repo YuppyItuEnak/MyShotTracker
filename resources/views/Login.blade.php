@@ -44,7 +44,7 @@
                             class="py-2.5 w-full px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-primary rounded-lg border border-gray-200 hover:bg-primary hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-primary dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Login</button>
 
                         <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                            Don’t have an account yet? <a href="#"
+                            Don’t have an account yet? <a href="{{ route('signup') }}"
                                 class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
                         </p>
                     </form>

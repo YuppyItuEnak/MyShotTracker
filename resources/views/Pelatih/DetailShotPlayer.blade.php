@@ -1,4 +1,13 @@
 <x-pelatih-layout>
+    <a href="javascript:history.back()"
+        class="inline-flex items-center px-4 py-2 mb-5 text-sm font-medium text-black bg-grafik rounded-lg shadow-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back
+    </a>
+
     <h1 class="text-white mb-5 text-2xl font-bold italic">Shoot Training Date: <span
             class="text-grafik">{{ $overallShot->date }}</span></h1>
 
@@ -8,7 +17,7 @@
                 class="text-xs text-gray-700 uppercase text-center bg-primary border-secondary dark:bg-primary dark:border-secondary dark:text-gray-400">
                 <tr>
                     <th scope="col" class="p-4">
-                        Id
+                        No
                     </th>
                     <th scope="col" class="px-6 py-3">
                         Location
@@ -25,11 +34,11 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($shotTraining as $shot)
+                @foreach ($shotTraining as $index => $shot)
                     <tr
                         class="bg-white border-b text-center dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
                         <th scope="col" class="p-4">
-                            {{ $shot->id }}
+                            {{ $index + 1 }}
                         </th>
                         <th scope="col" class="px-6 py-3">
                             {{ $shot->location }}
