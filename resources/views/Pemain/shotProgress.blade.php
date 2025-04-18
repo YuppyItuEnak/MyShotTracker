@@ -1,4 +1,4 @@
-<x-layout>
+{{-- <x-layout>
     <div class="flex items-center justify-between">
         <h1 class="text-4xl font-extrabold text-white tracking-tight md:text-5xl lg:text-6xl mb-5">
             Report Progress
@@ -146,4 +146,4 @@
 
 
 
-</x-layout>
+</x-layout> --}}

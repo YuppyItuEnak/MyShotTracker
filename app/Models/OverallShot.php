@@ -9,19 +9,15 @@ class OverallShot extends Model
 {
     use HasFactory;
 
-    // protected $casts = [
-    //     'date' => 'date', // Konversi otomatis ke Carbon
-    // ];
-
-    protected $fillable = ['user_id', 'totalmade', 'totalattempt', 'totalaccuracy', 'date'];
+    protected $fillable = ['totalmade', 'totalattempt', 'totalaccuracy', 'date'];
 
     public function shotTrainings()
     {
         return $this->hasMany(ShotTraining::class, 'overall_shot_id');
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
 }

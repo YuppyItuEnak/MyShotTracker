@@ -1,4 +1,4 @@
-<x-layout>
+{{-- <x-layout>
     <div>
         <h1 class="text-4xl italic font-extrabold text-white tracking-tight md:text-5xl lg:text-6xl mb-5">
             Shooting Training Detail
@@ -104,4 +104,4 @@
             </div>
         @endforeach
     </div>
-</x-layout>
+</x-layout> --}}

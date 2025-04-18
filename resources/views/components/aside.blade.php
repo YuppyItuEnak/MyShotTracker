@@ -55,7 +55,7 @@
 
             </li>
             <li>
-                <a href="{{ route('pemain.reportProgress') }}"
+                {{-- <a href="{{ route('pemain.reportProgress') }}"
                     class="flex items-center p-2 text-white rounded-lg hover:bg-secondary group">
                     <svg class="flex-shrink-0 w-5 h-5 text-white transition duration-75 group-hover:text-secondary"
                         fill="#ffffff" viewBox="0 0 1000 1000" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@
                         </g>
                     </svg>
                     <span class="flex-1 ms-3 whitespace-nowrap">Reports Card</span>
-                </a>
+                </a> --}}
             </li>
         </ul>
     </div>

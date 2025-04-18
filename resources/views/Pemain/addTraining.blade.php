@@ -32,92 +32,128 @@
 
             <div>
                 <h1 class="text-2xl font-bold italic text-white">Shot Training</h1>
-                <form action="{{ route('pemain.store') }}" method="POST" enctype="multipart/form-data">
-                    @method('POST')
+                <form id="training-form" action="{{ route('training.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    {{-- <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
 
-                    <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
 
                     <!-- Date Input -->
                     <div class="mb-4">
                         <label class="block text-sm mb-2 text-white" for="date">Date:</label>
-                        <div class="flex flex-row justify-between items-center">
-                            <input type="date" name="date" id="date"
-                                class="w-full bg-gray-700 text-white px-4 py-2 rounded" >
-                        </div>
-                    </div>
+                        <input type="date" name="date" id="date"
+                            class="w-full bg-gray-700 text-white px-4 py-2 rounded">
+                    </div> --}}
 
-                    <!-- Container untuk Shooting Location -->
+                    <!-- Tempat Form Training -->
                     <div id="shooting-location-container">
-                        <x-add-training-form></x-add-training-form> <!-- Form pertama -->
-                    </div>
+                        <div id="shot-container">
+                            <div class="relative border rounded p-5 mb-2 font-bold italic shot-form">
+                                <div class="mb-4">
+                                    <label class="block text-sm mb-2 text-white" for="location_0" name="location">Location</label>
+                                    <select name="location"
+                                        class="w-full bg-gray-700 text-white px-4 py-2 rounded location-select"
+                                        id="location_0">
+                                        <option value="">Choose Shooting Location</option>
+                                        <option value="Right Corner">Right Corner</option>
+                                        <option value="Left Corner">Left Corner</option>
+                                        <option value="Right Wing">Right wing</option>
+                                        <option value="Left Wing">Left wing</option>
+                                        <option value="Top">Top</option>
+                                        <option value="Right Short Corner">Right Short Corner</option>
+                                        <option value="Left Short Corner">Left Short Corner</option>
+                                        <option value="Right Elbow">Right Elbow</option>
+                                        <option value="Left Elbow">Left Elbow</option>
+                                        <option value="Top Of The Key">Top of The Key</option>
+                                        <option value="Top Of The Key">Freethrow</option>
+                                    </select>
+                                </div>
 
-                    <!-- Tombol Tambah Form -->
-                    <button type="button" id="add-location"
-                        class="bg-gray-700 text-white px-4 py-2 rounded w-full flex items-center justify-center mt-4">
-                        <i class="fas fa-plus-circle mr-2"></i>
-                        Add Shooting Location
-                    </button>
+                                <div class="mb-4">
+                                    <div class="w-full">
+                                        <label class="block text-sm mb-2 text-white" for="attempt_0">Attempt</label>
+                                        <input name="attempt"
+                                            class="w-full bg-gray-700 text-white px-4 py-2 rounded attempt"
+                                            id="attempt_0" type="number" min="0" />
+                                    </div>
+                                </div>
+                                <div class="mb-4 flex">
+                                    <div class="w-1/2 mr-2">
+                                        <button type="submit"
+                                            class="bg-grafik text-black font-bold italic px-4 py-2 rounded w-full mt-4">
+                                            Start
+                                        </button>
+                                    </div>
+                                    {{-- <div class="w-1/2">
+                                        <button id="finish-button"
+                                            class="bg-grafik text-black font-bold italic px-4 py-2 rounded w-full mt-4">
+                                            Finish
+                                        </button>
 
-                    <!-- Submit Form -->
-                    <button type="submit" name="submit"
-                        class="bg-grafik text-black font-bold italic px-4 py-2 rounded w-full flex items-center justify-center mt-4">
-                        Submit
-                    </button>
+                                    </div> --}}
+
+                                </div>
+                            </div>
+
+                        </div>
+                        {{-- <button id="btn-submit"
+                            class="bg-grafik text-black font-bold italic px-4 py-2 rounded w-full mt-4">
+                            Submit
+                        </button> --}}
                 </form>
+                <!-- Status Real-time -->
+                <div class="status-box" id="training-status">
+                    <p>Memuat status latihan...</p>
+                </div>
+
             </div>
         </div>
 
 
     </div>
-
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const container = document.getElementById("shooting-location-container");
-            const addButton = document.getElementById("add-location");
 
-            let shotIndex = 0; // Index untuk form yang ditambahkan
-
-            // Fungsi untuk menambahkan form baru
-            function addShotForm() {
-                shotIndex++; // Increment index setiap form baru ditambahkan
-
-                // Clone form pertama yang ada di dalam container
-                const newForm = container.firstElementChild.cloneNode(true);
-
-                // Reset input dalam form yang baru ditambahkan
-                newForm.querySelectorAll("select, input").forEach((input) => {
-                    input.value = "";
-
-                    // Perbaiki atribut name agar mengikuti format array dengan index yang benar
-                    if (input.name.includes("data[")) {
-                        input.name = input.name.replace(/\d+/, shotIndex);
-                    }
+        function fetchTrainingStatus() {
+            fetch('/api/training-status')
+                .then(res => res.json())
+                .then(data => {
+                    const html = `
+                    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 mt-6">
+                      <h3 class="text-2xl font-bold mb-4 text-gray-800">Status Sesi Latihan</h3>
+                      <div class="space-y-3">
+                        <div class="flex justify-between">
+                          <span class="font-medium text-gray-700">Lokasi:</span>
+                          <span class="text-gray-900">${data.location}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span class="font-medium text-gray-700">Target Attempt:</span>
+                          <span class="text-gray-900">${data.attempt}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span class="font-medium text-gray-700">Jumlah Dihitung:</span>
+                          <span class="text-gray-900">${data.shotmade}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                          <span class="font-medium text-gray-700">Status:</span>
+                          ${data.is_active
+                            ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>`
+                            : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Selesai</span>`}
+                        </div>
+                      </div>
+                    </div>
+                    `;
+                    document.getElementById('training-status').innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('training-status').innerHTML = `
+                    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6 mt-6 text-center text-gray-500">
+                      Tidak ada sesi aktif.
+                    </div>`;
                 });
+        }
 
-                container.appendChild(newForm);
-            }
-
-            // Event listener untuk tombol tambah lokasi
-            addButton.addEventListener("click", function() {
-                addShotForm();
-            });
-
-            // Event listener untuk tombol hapus
-            container.addEventListener("click", function(event) {
-                if (event.target.classList.contains("delete-form")) {
-                    const forms = document.querySelectorAll(".shot-form");
-
-                    // Hapus form hanya jika jumlahnya lebih dari satu
-                    if (forms.length > 1) {
-                        event.target.closest(".shot-form").remove();
-                    }
-                }
-            });
-        });
+        // polling setiap 2 detik
+        setInterval(fetchTrainingStatus, 2000);
+        fetchTrainingStatus();
     </script>
-
-
-
 
 </x-layout>

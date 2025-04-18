@@ -13,16 +13,30 @@ return new class extends Migration
     {
         Schema::create('shot_trainings', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('overall_shot_id')->constrained('overall_shots')->onDelete('cascade');
-            $table->integer('shotmade');
-            $table->integer('attempt');
-            // $table->time('duration');
-            $table->enum('location', ['Right Corner', 'Left Corner', 'Top', 'Right Wing', 'Left Wing',  'Right Short Corner', 'Left Short Corner', 'Right Elbow', 'Left Elbow', 'Top Of The Key']);
-            $table->double('accuracy', 5, 2);
+            $table->integer('shotmade')->default(0); // Jumlah bola masuk yang terbaca sensor
+            $table->integer('attempt');              // Target attempt dari user
+            $table->enum('location', [
+                'Right Corner',
+                'Left Corner',
+                'Top',
+                'Right Wing',
+                'Left Wing',
+                'Right Short Corner',
+                'Left Short Corner',
+                'Right Elbow',
+                'Left Elbow',
+                'Top Of The Key',
+                'Freethrow'
+            ]);
+            $table->double('accuracy', 5, 2)->default(0); // Akurasi hasil training
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
+
+
+
 
     /**
      * Reverse the migrations.

@@ -9,12 +9,9 @@ class ShotTraining extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 'overall_shot_id', 'shotmade', 'attempt', 'location', 'accuracy'];
+    protected $fillable = ['overall_shot_id', 'shotmade', 'attempt', 'location', 'accuracy', 'is_active'];
 
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+
 
     public function overallShot()
     {

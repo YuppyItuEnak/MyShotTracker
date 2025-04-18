@@ -9,18 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('overall_shots', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('totalmade');
-            $table->integer('totalattempt');
-            $table->double('totalaccuracy', 5, 2);
-            $table->date('date');
-            $table->timestamps();
-        });
-    }
+        public function up(): void
+        {
+            Schema::create('overall_shots', function (Blueprint $table) {
+                $table->id();
+                // $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->integer('totalmade');
+                $table->integer('totalattempt');
+                $table->double('totalaccuracy', 5, 2);
+                $table->date('date');
+                $table->timestamps();
+            });
+        }
 
     /**
      * Reverse the migrations.
