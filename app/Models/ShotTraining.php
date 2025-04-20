@@ -9,7 +9,7 @@ class ShotTraining extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['overall_shot_id', 'shotmade', 'attempt', 'location', 'accuracy', 'is_active'];
+    protected $fillable = ['overall_shot_id','shotmade', 'attempt', 'location', 'accuracy', ' is_active'];
 
 
 

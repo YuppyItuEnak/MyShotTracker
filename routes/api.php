@@ -14,36 +14,86 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+// Route::post('/sensor/shot-made', function (Request $request) {
+//     $validated = $request->validate([
+//         'sensor_id' => 'required|string',
+//         'value' => 'required|boolean', // true when shot is made
+//     ]);
+
+//     // Find the active training session
+//     $activeTraining = ShotTraining::where('is_active', true)
+//         ->latest()
+//         ->first();
+
+//     if (!$activeTraining) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'No active training session found'
+//         ]);
+//     }
+
+//     // Only increment if value is true (shot made) and not reached the target yet
+//     if ($validated['value'] && $activeTraining->shotmade < $activeTraining->attempt) {
+//         $activeTraining->shotmade = $activeTraining->shotmade + 1;
+
+//         // Update accuracy in real-time
+//         if ($activeTraining->attempt > 0) {
+//             $activeTraining->accuracy = ($activeTraining->shotmade / $activeTraining->attempt) * 100;
+//         }
+
+//         $activeTraining->save();
+//     }
+
+//     return response()->json([
+//         'success' => true,
+//         'current_shots' => $activeTraining->shotmade,
+//         'target' => $activeTraining->attempt,
+//         'accuracy' => $activeTraining->accuracy,
+//         'is_complete' => $activeTraining->shotmade >= $activeTraining->attempt
+//     ]);
+// });
+
 
 Route::post('/update-training-counter', function (Request $request) {
     $session = ShotTraining::where('is_active', true)->latest()->first();
 
     if ($session) {
-        $session->shotmade += 1;
-
-        // Jika shotmade belum mencapai batas attempt
-        if ($session->shotmade < $session->attempt) {
-            $session->save();
-            return response()->json(['message' => 'Shot made counted']);
+        // Jangan update jika sudah melebihi attempt
+        if ($session->shotmade >= $session->attempt) {
+            return response()->json(['message' => 'Semua attempt sudah dilakukan'], 400);
         }
 
-        // Jika sudah selesai: hitung akurasi, matikan sesi, dan update overall
-        $session->is_active = false;
-        $session->accuracy = ($session->shotmade / $session->attempt) * 100;
+        $session->shotmade += 1;
         $session->save();
 
-        // Update ke OverallShot
-        $overall = $session->overallShot;
-        $overall->totalmade += $session->shotmade;
-        $overall->totalattempt += $session->attempt;
-        $overall->totalaccuracy = ($overall->totalmade / $overall->totalattempt) * 100;
-        $overall->save();
-
-        return response()->json(['message' => 'Sesi selesai dan data overall diperbarui']);
+        return response()->json(['message' => 'Shot made counted']);
     }
 
     return response()->json(['success' => false], 404);
 });
+
+Route::post('/finish-training-session', function (Request $request) {
+    $session = ShotTraining::where('is_active', true)->latest()->first();
+
+    if (!$session) {
+        return response()->json(['success' => false, 'message' => 'Tidak ada sesi aktif'], 404);
+    }
+
+    if ($session->shotmade < $session->attempt) {
+        return response()->json(['message' => 'Latihan belum selesai, masih ada attempt tersisa'], 400);
+    }
+
+    $session->is_active = false;
+    $session->accuracy = ($session->shotmade / $session->attempt) * 100;
+    $session->save();
+
+
+
+    return response()->json(['message' => 'Sesi latihan diselesaikan']);
+});
+
+
+
 
 Route::get('/training-status', function () {
     $session = ShotTraining::where('is_active', true)->latest()->first();

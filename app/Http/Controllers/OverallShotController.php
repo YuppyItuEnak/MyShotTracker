@@ -33,38 +33,40 @@ class OverallShotController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'date' => 'required|date',
-            'trainings' => 'required|array|min:1',
-            'trainings.*.location' => 'required',
-            'trainings.*.attempt' => 'required|integer',
-            'trainings.*.shotmade' => 'required|integer',
-            'trainings.*.accuracy' => 'required|numeric',
-        ]);
+        // dd(request()->all());
+        $userId = Auth::user()->id;
+        // Ambil semua latihan yang belum dikelompokkan (is_active = false dan belum punya overall_shot_id)
+        $trainings = ShotTraining::where('is_active', false)
+            ->whereNull('overall_shot_id')
+            ->get();
 
-        $totalMade = collect($request->trainings)->sum('shotmade');
-        $totalAttempt = collect($request->trainings)->sum('attempt');
-        $totalAccuracy = $totalAttempt > 0 ? ($totalMade / $totalAttempt) * 100 : 0;
-
-        $overall = OverallShot::create([
-            'user_id' => (int) $request->user_id,
-            'date' => $request->date,
-            'totalmade' => $totalMade,
-            'totalattempt' => $totalAttempt,
-            'totalaccuracy' => $totalAccuracy
-        ]);
-
-        foreach ($request->trainings as $data) {
-            ShotTraining::create([
-                'overall_shot_id' => $overall->id,
-                'location' => $data['location'],
-                'attempt' => $data['attempt'],
-                'shotmade' => $data['shotmade'],
-                'accuracy' => $data['accuracy'],
-            ]);
+        if ($trainings->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada sesi latihan yang selesai.'], 400);
         }
 
-        return redirect()->back()->with('success', 'Training saved successfully!');
+        // Hitung total attempt dan shotmade
+        $totalAttempt = $trainings->sum('attempt');
+        $totalShotmade = $trainings->sum('shotmade');
+
+        // Buat overall_shot
+        $overall = OverallShot::create([
+            'user_id' => $userId,
+            'date' => now(),
+            'totalmade' => $totalAttempt,
+            'totalattempt' => $totalShotmade,
+        ]);
+
+        // Update setiap shot_training agar terhubung ke overall_shot_id
+        foreach ($trainings as $training) {
+            $training->update(['overall_shot_id' => $overall->id]);
+        }
+
+        return response()->json([
+            'message' => 'Sesi latihan berhasil disimpan sebagai overall_shots.',
+            'overall_id' => $overall->id,
+            'total_attempt' => $totalAttempt,
+            'total_shotmade' => $totalShotmade
+        ]);
     }
 
     /**

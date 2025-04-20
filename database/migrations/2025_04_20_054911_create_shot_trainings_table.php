@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('shot_trainings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('overall_shot_id')->constrained('overall_shots')->onDelete('cascade');
+            $table->foreignId('overall_shot_id')->nullable()->constrained('overall_shots')->onDelete('cascade');
+
             $table->integer('shotmade')->default(0); // Jumlah bola masuk yang terbaca sensor
             $table->integer('attempt');              // Target attempt dari user
             $table->enum('location', [
@@ -34,9 +35,6 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-
-
-
 
     /**
      * Reverse the migrations.

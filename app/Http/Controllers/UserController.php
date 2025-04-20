@@ -78,7 +78,7 @@ class UserController extends Controller
             if (Auth::user()->role === 'Pelatih') {
                 return redirect()->route('pelatih.index')->with('success', 'Training saved successfully.');
             } elseif (Auth::user()->role === 'Pemain') {
-                return redirect()->route('pemain.index')->with('success', 'Training saved successfully.');
+                return redirect()->route('pemain.create')->with('success', 'Training saved successfully.');
             }
         }
 

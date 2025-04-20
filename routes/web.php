@@ -69,10 +69,13 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 // Route::get('/addtraining', function () {
 //     return view('Pemain.addTraining');
 // });
+// Route::post('/training/start', [ShotTrainingController::class, 'startSession'])->name('training.start');
+// Route::post('/training/finish', [ShotTrainingController::class, 'finishSession'])->name('training.finish');
+// Route::get('/api/training-status/{sessionId}', [ShotTrainingController::class, 'getStatus']);
 
 
 Route::post('/start-training', [ShotTrainingController::class, 'store'])->name('training.store');
+Route::post('/finish-training', [OverallShotController::class, 'store']);
+Route::post('/update-overall', [shotTrainingController::class, 'updateData'])->name('training.updateData');
 
 Route::get('/training-status-page', [ShotTrainingController::class, 'index'])->name('training.index');
-
-
