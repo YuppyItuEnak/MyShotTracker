@@ -17,6 +17,7 @@ return new class extends Migration
 
             $table->integer('shotmade')->default(0); // Jumlah bola masuk yang terbaca sensor
             $table->integer('attempt');              // Target attempt dari user
+            $table->string('duration')->nullable();
             $table->enum('location', [
                 'Right Corner',
                 'Left Corner',

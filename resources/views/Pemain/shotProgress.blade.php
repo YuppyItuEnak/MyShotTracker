@@ -1,4 +1,4 @@
-{{-- <x-layout>
+<x-layout>
     <div class="flex items-center justify-between">
         <h1 class="text-4xl font-extrabold text-white tracking-tight md:text-5xl lg:text-6xl mb-5">
             Report Progress
@@ -12,11 +12,13 @@
 
     <div class="flex flex-row justify-between">
         <div class=" flex flex-row mt-5 mb-5">
-            <button onclick="changeWeek(-1)" class="border rounded bg-primary p-4 text-white font-bold italic">Previous Week</button>
+            <button onclick="changeWeek(-1)" class="border rounded bg-primary p-4 text-white font-bold italic">Previous
+                Week</button>
         </div>
 
         <div class=" flex flex-row mt-5 mb-5">
-            <button onclick="changeWeek(1)" class="border rounded bg-grafik p-4 text-black font-bold italic">Next Week</button>
+            <button onclick="changeWeek(1)" class="border rounded bg-grafik p-4 text-black font-bold italic">Next
+                Week</button>
         </div>
     </div>
 
@@ -120,14 +122,39 @@
         var weeks = @json($weeks);
         var currentWeekIndex = Object.keys(weeks).length - 1; // Tampilkan minggu terbaru
 
+        function mergeSameDateData(weekData) {
+            const merged = {};
+
+            weekData.forEach(item => {
+                if (merged[item.label]) {
+                    merged[item.label].push(item.value);
+                } else {
+                    merged[item.label] = [item.value];
+                }
+            });
+
+            const labels = Object.keys(merged);
+            const data = labels.map(label => {
+                const values = merged[label];
+                const average = values.reduce((sum, val) => sum + val, 0) / values.length;
+                return Math.round(average);
+            });
+
+            return {
+                labels,
+                data
+            };
+        }
+
+
         function updateChart(weekIndex) {
             let weekKey = Object.keys(weeks)[weekIndex];
             if (weeks[weekKey]) {
-                let labels = weeks[weekKey].map(item => item.label);
-                let data = weeks[weekKey].map(item => item.value);
-                renderChart(labels, data, weekKey);
+                let merged = mergeSameDateData(weeks[weekKey]);
+                renderChart(merged.labels, merged.data, weekKey);
             }
         }
+
 
         updateChart(currentWeekIndex);
 
@@ -146,4 +173,4 @@
 
 
 
-</x-layout> --}}
+</x-layout>

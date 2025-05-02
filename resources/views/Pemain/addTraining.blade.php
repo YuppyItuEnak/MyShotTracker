@@ -35,15 +35,6 @@
                 <form id="training-form" action="{{ route('training.store') }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
-                    {{-- <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
-
-
-                    <!-- Date Input -->
-                    <div class="mb-4">
-                        <label class="block text-sm mb-2 text-white" for="date">Date:</label>
-                        <input type="date" name="date" id="date"
-                            class="w-full bg-gray-700 text-white px-4 py-2 rounded">
-                    </div> --}}
 
                     <!-- Tempat Form Training -->
                     <div id="shooting-location-container">
@@ -66,24 +57,54 @@
                                         <option value="Right Elbow">Right Elbow</option>
                                         <option value="Left Elbow">Left Elbow</option>
                                         <option value="Top Of The Key">Top of The Key</option>
-                                        <option value="Top Of The Key">Freethrow</option>
+                                        <option value="Freethrow">Freethrow</option>
                                     </select>
                                 </div>
 
-                                <div class="mb-4">
-                                    <div class="w-full">
+                                <div class="mb-4 flex">
+                                    <div class="w-1/2 mr-2">
                                         <label class="block text-sm mb-2 text-white" for="attempt_0">Attempt</label>
                                         <input name="attempt"
                                             class="w-full bg-gray-700 text-white px-4 py-2 rounded attempt"
                                             id="attempt_0" type="number" min="0" />
                                     </div>
+                                    <div class="w-1/2">
+                                        <label for="duration" class="block mb-2 text-sm font-medium text-white">Durasi
+                                            Latihan</label>
+                                        <div class="flex">
+                                            <div class="w-1/2 mr-1">
+                                                <input type="number" id="minutes" min="0" max="59"
+                                                    placeholder="Menit"
+                                                    class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5" />
+                                            </div>
+                                            <div class="w-1/2">
+                                                <input type="number" id="seconds" min="0" max="59"
+                                                    placeholder="Detik"
+                                                    class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5" />
+                                            </div>
+                                            <input type="hidden" name="duration" id="duration_value" />
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <!-- Stopwatch Display -->
+                                <div class="mb-4">
+                                    <div id="stopwatch-container" class="hidden">
+                                        <label class="block text-sm mb-2 text-white">Waktu Berjalan</label>
+                                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+                                            <span id="stopwatch-display"
+                                                class="text-3xl font-bold text-grafik">00:00</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-4 flex">
                                     <div class="w-1/2 mr-2">
-                                        <button type="submit"
+                                        <button type="button" id="start-button"
                                             class="bg-grafik text-black font-bold italic px-4 py-2 rounded w-full">
                                             Start
                                         </button>
+
                                     </div>
                                     <div class="w-1/2">
                                         <button type="button" id="finish-button"
@@ -116,8 +137,41 @@
 
     </div>
     <script>
-        document.getElementById("finish-button").addEventListener("click", function() {
-            fetch("http://192.168.18.34:8000/api/finish-training-session", {
+        const startButton = document.getElementById('start-button');
+        const finishButton = document.getElementById('finish-button');
+        const trainingForm = document.getElementById('training-form');
+
+        startButton.addEventListener("click", function() {
+            const location = document.querySelector('.location-select').value;
+            const attempt = document.querySelector('.attempt').value;
+
+            if (!location) {
+                alert('Silakan pilih lokasi tembakan');
+                return;
+            }
+
+            if (!attempt || attempt <= 0) {
+                alert('Silakan masukkan jumlah attempt');
+                return;
+            }
+
+            const formData = new FormData(trainingForm);
+            fetch(trainingForm.action, {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Training session started:', data);
+                    // Start polling for status updates automatically
+                    fetchTrainingStatus();
+                })
+                .catch(error => console.error('Error starting training:', error));
+
+        });
+
+        finishButton.addEventListener("click", function() {
+            fetch("http://192.168.1.93:8000/api/finish-training-session", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

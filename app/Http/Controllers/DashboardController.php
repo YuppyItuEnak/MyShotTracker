@@ -48,6 +48,8 @@ class DashboardController extends Controller
         //
     }
 
+
+
     /**
      * Display the specified resource.
      */
@@ -64,8 +66,8 @@ class DashboardController extends Controller
         $overallShot = OverallShot::where('user_id', $id)->get();
         // dd($overallShot);
 
-        $trainingcount = TrainingCount::where('user_id', $id)->first();
-        $trainingcount = $trainingcount->training_count;
+        // $trainingcount = TrainingCount::where('user_id', $id)->first();
+        // $trainingcount = $trainingcount->training_count;
         // dd($trainingcount);
 
         $weeks = [];
@@ -92,8 +94,8 @@ class DashboardController extends Controller
         if (!empty($currentWeek)) {
             $weeks["Week $weekCounter"] = $currentWeek;
         }
-
-        return view('Pelatih.DetailPlayer', compact('weeks', 'user', 'overallShot', 'trainingcount'));
+// , 'trainingcount'
+        return view('Pelatih.DetailPlayer', compact('weeks', 'user', 'overallShot'));
     }
 
     //Memanggil id untuk shotTraining

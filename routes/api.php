@@ -4,6 +4,7 @@ use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ShotTrainingController;
 use App\Models\SensorPoint;
 use App\Models\ShotTraining;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -52,6 +53,7 @@ Route::get('/user', function (Request $request) {
 //         'is_complete' => $activeTraining->shotmade >= $activeTraining->attempt
 //     ]);
 // });
+
 
 
 Route::post('/update-training-counter', function (Request $request) {
@@ -107,6 +109,7 @@ Route::get('/training-status', function () {
         'attempt' => $session->attempt,
         'shotmade' => $session->shotmade,
         'accuracy' => $session->accuracy,
-        'is_active' => $session->is_active
+        'is_active' => $session->is_active,
+        'duration' => $session->duration // Added duration field
     ]);
 });

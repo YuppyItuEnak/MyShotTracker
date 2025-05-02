@@ -28,7 +28,7 @@
         <!-- Bagian Kanan: Training Count -->
         <div class="border border-secondary p-4 bg-primary flex flex-col justify-center items-center w-full md:w-auto">
             <h1 class="text-2xl md:text-3xl font-extrabold text-center text-white tracking-tight">
-                {{ $trainingcount }}
+                {{-- {{ $trainingcount }}~ --}}
             </h1>
             <h1 class="text-sm md:text-lg font-extrabold text-center text-grafik tracking-tight">
                 Training Count
