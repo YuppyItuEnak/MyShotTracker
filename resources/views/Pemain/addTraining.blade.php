@@ -171,7 +171,7 @@
         });
 
         finishButton.addEventListener("click", function() {
-            fetch("http://192.168.1.93:8000/api/finish-training-session", {
+            fetch("/api/finish-training-session", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
