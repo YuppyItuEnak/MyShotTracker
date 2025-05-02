@@ -24,13 +24,13 @@
                             {{ $item->location }}
                         </td>
                         <td class="px-6 py-4">
-                            {{ $item->attempt }}
-                        </td>
-                        <td class="px-6 py-4">
                             {{ $item->shotmade }}
                         </td>
                         <td class="px-6 py-4">
-                            6 Minute
+                            {{ $item->attempt }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{ $item->duration }}
                         </td>
                     </tr>
                 @endforeach
@@ -40,7 +40,8 @@
         <div class="w-full mt-4 mb-4">
             <form action="{{ route('training.updateData') }}" method="POST">
                 @csrf
-                <button type="submit" id="submit-button" class="bg-gray-500 text-white font-bold italic px-4 py-2 rounded w-full">
+                <button type="submit" id="submit-button"
+                    class="bg-gray-500 text-white font-bold italic px-4 py-2 rounded w-full">
                     Submit All
                 </button>
             </form>

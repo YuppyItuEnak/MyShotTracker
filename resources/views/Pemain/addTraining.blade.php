@@ -15,7 +15,6 @@
                 </svg>
             </button>
         </div>
-
     </div>
 
     <div class="grid grid-cols-1 gap-2 p-4">
@@ -104,7 +103,6 @@
                                             class="bg-grafik text-black font-bold italic px-4 py-2 rounded w-full">
                                             Start
                                         </button>
-
                                     </div>
                                     <div class="w-1/2">
                                         <button type="button" id="finish-button"
@@ -123,24 +121,126 @@
                     <p>Memuat status latihan...</p>
                 </div>
 
-
                 <!-- Hasil Status  -->
                 <div class="status-box" id="training-result">
                     <p>Memuat status latihan...</p>
                 </div>
-
-
-
             </div>
         </div>
-
-
     </div>
+
     <script>
         const startButton = document.getElementById('start-button');
         const finishButton = document.getElementById('finish-button');
         const trainingForm = document.getElementById('training-form');
+        const minutesInput = document.getElementById('minutes');
+        const secondsInput = document.getElementById('seconds');
+        const durationValue = document.getElementById('duration_value');
+        const stopwatchContainer = document.getElementById('stopwatch-container');
+        const stopwatchDisplay = document.getElementById('stopwatch-display');
 
+        // Variables for stopwatch
+        let totalSeconds = 0;
+        let countdownInterval = null;
+        let isRunning = false;
+
+        // Format time as MM:SS
+        function formatTime(totalSecs) {
+            const minutes = Math.floor(totalSecs / 60);
+            const seconds = totalSecs % 60;
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Validate inputs to ensure they are valid numbers
+        function validateTimeInputs() {
+            let mins = parseInt(minutesInput.value) || 0;
+            let secs = parseInt(secondsInput.value) || 0;
+
+            // Adjust seconds if over 59
+            if (secs > 59) {
+                mins += Math.floor(secs / 60);
+                secs = secs % 60;
+                secondsInput.value = secs;
+                minutesInput.value = mins;
+            }
+
+            // Return total seconds
+            return (mins * 60) + secs;
+        }
+
+        // Start the stopwatch countdown
+        function startStopwatch() {
+            if (isRunning) return;
+
+            totalSeconds = validateTimeInputs();
+
+            // Check if time is specified
+            if (totalSeconds <= 0) {
+                alert('Please enter a valid time (at least 1 second)');
+                return false;
+            }
+
+            // Format duration for database as "MM:SS"
+            const minutes = parseInt(minutesInput.value) || 0;
+            const seconds = parseInt(secondsInput.value) || 0;
+            const formattedDuration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Set the duration value for form submission in MM:SS format
+            durationValue.value = formattedDuration;
+
+            // Show stopwatch container
+            stopwatchContainer.classList.remove('hidden');
+
+            // Update display immediately
+            stopwatchDisplay.textContent = formatTime(totalSeconds);
+
+            // Start countdown
+            isRunning = true;
+            startButton.classList.add('bg-gray-500');
+            startButton.classList.remove('bg-grafik');
+
+            countdownInterval = setInterval(() => {
+                totalSeconds--;
+                stopwatchDisplay.textContent = formatTime(totalSeconds);
+
+                if (totalSeconds <= 0) {
+                    // Time's up
+                    clearInterval(countdownInterval);
+                    isRunning = false;
+                    stopwatchDisplay.textContent = "00:00";
+
+                    // Alert user
+                    alert("Time's up!");
+
+                    // Reset UI
+                    resetStopwatch();
+                }
+            }, 1000);
+
+            return true;
+        }
+
+        // Stop the stopwatch
+        function stopStopwatch() {
+            if (!isRunning) return;
+
+            clearInterval(countdownInterval);
+            isRunning = false;
+
+            // Reset UI
+            startButton.classList.remove('bg-gray-500');
+            startButton.classList.add('bg-grafik');
+        }
+
+        // Reset the stopwatch
+        function resetStopwatch() {
+            stopStopwatch();
+            stopwatchDisplay.textContent = "00:00";
+            startButton.classList.remove('bg-gray-500');
+            startButton.classList.add('bg-grafik');
+        }
+
+        // Enhanced start button functionality
         startButton.addEventListener("click", function() {
             const location = document.querySelector('.location-select').value;
             const attempt = document.querySelector('.attempt').value;
@@ -155,8 +255,10 @@
                 return;
             }
 
-            const formData = new FormData(trainingForm);
-            fetch(trainingForm.action, {
+            // Start the stopwatch and continue with form submission if successful
+            if (startStopwatch()) {
+                const formData = new FormData(trainingForm);
+                fetch(trainingForm.action, {
                     method: 'POST',
                     body: formData,
                 })
@@ -167,24 +269,44 @@
                     fetchTrainingStatus();
                 })
                 .catch(error => console.error('Error starting training:', error));
-
+            }
         });
 
+        // Enhanced finish button functionality
         finishButton.addEventListener("click", function() {
+            // Stop the stopwatch
+            stopStopwatch();
+
             fetch("/api/finish-training-session", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert("Sesi latihan diselesaikan!");
-                    console.log(data);
-                    window.location.href = '/training-status-page';
-                })
-                .catch(error => console.error("Error:", error));
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Sesi latihan diselesaikan!");
+                console.log(data);
+                window.location.href = '/training-status-page';
+            })
+            .catch(error => console.error("Error:", error));
+
+            // Hide stopwatch container
+            stopwatchContainer.classList.add('hidden');
+        });
+
+        // Add input validation to prevent negative numbers and non-numeric input
+        minutesInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (parseInt(this.value) > 59) this.value = '59';
+            if (this.value.startsWith('0') && this.value.length > 1) this.value = this.value.substring(1);
+        });
+
+        secondsInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (parseInt(this.value) > 59) this.value = '59';
+            if (this.value.startsWith('0') && this.value.length > 1) this.value = this.value.substring(1);
         });
 
         // polling untuk status aktif latihan
@@ -231,6 +353,4 @@
         setInterval(fetchTrainingStatus, 2000);
         fetchTrainingStatus();
     </script>
-
-
 </x-layout>
