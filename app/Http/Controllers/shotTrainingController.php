@@ -57,25 +57,6 @@ class ShotTrainingController extends Controller
         }
     }
 
-    private function updateTrainingCount($userId)
-    {
-        $user = User::where('id', $userId)->where('role', 'pemain')->first();
-
-        if (!$user) {
-            dd("User tidak ditemukan atau bukan pemain!");
-        }
-
-        // Hitung total training berdasarkan OverallShot
-        $totalTraining = OverallShot::where('user_id', $userId)->count();
-
-        // Update atau buat baru data di TrainingCount
-        TrainingCount::updateOrCreate(
-            ['user_id' => $userId],
-            ['training_count' => $totalTraining]
-        );
-
-
-    }
 
     /**
      * Mencari sesi latihan yang sedang aktif atau buat yang baru,
@@ -124,6 +105,25 @@ class ShotTrainingController extends Controller
         return redirect()->route('Overall.index')->with('success', 'Sesi latihan berhasil digabungkan!');
     }
 
+    private function updateTrainingCount($userId)
+    {
+        $user = User::where('id', $userId)->where('role', 'pemain')->first();
+
+        if (!$user) {
+            dd("User tidak ditemukan atau bukan pemain!");
+        }
+
+        // Hitung total training berdasarkan OverallShot
+        $totalTraining = OverallShot::where('user_id', $userId)->count();
+
+        // Update atau buat baru data di TrainingCount
+        TrainingCount::updateOrCreate(
+            ['user_id' => $userId],
+            ['training_count' => $totalTraining]
+        );
+    }
+
+
 
     /**
      * Menampilkan laporan progress latihan per minggu.
@@ -167,11 +167,11 @@ class ShotTrainingController extends Controller
      */
     public function show(string $id)
     {
-          // dd($id);
-          $overallShot = OverallShot::findOrFail($id);
-          $shotTraining = ShotTraining::where('overall_shot_id', $id)->get();
-          // dd($shotTraining);xX
-          return view('Pemain.shotTrainingDetail', compact('shotTraining', 'overallShot'));
+        // dd($id);
+        $overallShot = OverallShot::findOrFail($id);
+        $shotTraining = ShotTraining::where('overall_shot_id', $id)->get();
+        // dd($shotTraining);xX
+        return view('Pemain.shotTrainingDetail', compact('shotTraining', 'overallShot'));
     }
 
     /**

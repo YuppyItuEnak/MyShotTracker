@@ -130,6 +130,7 @@
     </div>
 
     <script>
+
         const startButton = document.getElementById('start-button');
         const finishButton = document.getElementById('finish-button');
         const trainingForm = document.getElementById('training-form');
@@ -139,24 +140,26 @@
         const stopwatchContainer = document.getElementById('stopwatch-container');
         const stopwatchDisplay = document.getElementById('stopwatch-display');
 
-        // Variables for stopwatch
+        // Variables untuk stopwatch
         let totalSeconds = 0;
+        let initialTotalSeconds = 0; // menyimpan initial time untuk menghitung elapsed time
         let countdownInterval = null;
         let isRunning = false;
+        let timerExpired = false; // penanda untuk metracking waktu telah berakhir atau belom
 
-        // Format time as MM:SS
+        // Format time dengan MM:SS
         function formatTime(totalSecs) {
             const minutes = Math.floor(totalSecs / 60);
             const seconds = totalSecs % 60;
             return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Validate inputs to ensure they are valid numbers
+        // validasi input untuk memastikan variable yang dimasukan valid
         function validateTimeInputs() {
             let mins = parseInt(minutesInput.value) || 0;
             let secs = parseInt(secondsInput.value) || 0;
 
-            // Adjust seconds if over 59
+            // mengubah detika jika melebihi 59
             if (secs > 59) {
                 mins += Math.floor(secs / 60);
                 secs = secs % 60;
@@ -168,24 +171,26 @@
             return (mins * 60) + secs;
         }
 
-        // Start the stopwatch countdown
+        // Start stopwatch countdown
         function startStopwatch() {
             if (isRunning) return;
 
             totalSeconds = validateTimeInputs();
+            initialTotalSeconds = totalSeconds; // menyimpan initial total seconds
+            timerExpired = false; // Reset timer expired flag
 
-            // Check if time is specified
+            // Check klo waktu dispesifikasikan
             if (totalSeconds <= 0) {
                 alert('Please enter a valid time (at least 1 second)');
                 return false;
             }
 
-            // Format duration for database as "MM:SS"
+            // Format duration untuk database menjadi "MM:SS"
             const minutes = parseInt(minutesInput.value) || 0;
             const seconds = parseInt(secondsInput.value) || 0;
             const formattedDuration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-            // Set the duration value for form submission in MM:SS format
+            // Set duration value untuk form submission dalam format MM:SS
             durationValue.value = formattedDuration;
 
             // Show stopwatch container
@@ -207,10 +212,14 @@
                     // Time's up
                     clearInterval(countdownInterval);
                     isRunning = false;
+                    timerExpired = true; // Set timer expired flag
                     stopwatchDisplay.textContent = "00:00";
 
                     // Alert user
-                    alert("Time's up!");
+                    alert("Time's up! Training session ended.");
+
+                    // Update server that time has expired (automatically end training session)
+                    updateTimerExpiredStatus();
 
                     // Reset UI
                     resetStopwatch();
@@ -227,9 +236,21 @@
             clearInterval(countdownInterval);
             isRunning = false;
 
+            // Calculate elapsed time and update duration value
+            const elapsedSeconds = initialTotalSeconds - totalSeconds;
+            const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+            const remainingSeconds = elapsedSeconds % 60;
+            const elapsedFormatted =
+                `${elapsedMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+
+            // Update the duration_value to reflect actual elapsed time
+            durationValue.value = elapsedFormatted;
+
             // Reset UI
             startButton.classList.remove('bg-gray-500');
             startButton.classList.add('bg-grafik');
+
+            console.log(`Training stopped with elapsed time: ${elapsedFormatted}`);
         }
 
         // Reset the stopwatch
@@ -259,38 +280,37 @@
             if (startStopwatch()) {
                 const formData = new FormData(trainingForm);
                 fetch(trainingForm.action, {
-                    method: 'POST',
-                    body: formData,
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Training session started:', data);
-                    // Start polling for status updates automatically
-                    fetchTrainingStatus();
-                })
-                .catch(error => console.error('Error starting training:', error));
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Training session started:', data);
+                        // Start polling for status updates automatically
+                        fetchTrainingStatus();
+                    })
+                    .catch(error => console.error('Error starting training:', error));
             }
         });
 
-        // Enhanced finish button functionality
         finishButton.addEventListener("click", function() {
             // Stop the stopwatch
             stopStopwatch();
 
             fetch("/api/finish-training-session", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({})
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("Sesi latihan diselesaikan!");
-                console.log(data);
-                window.location.href = '/training-status-page';
-            })
-            .catch(error => console.error("Error:", error));
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Sesi latihan diselesaikan!");
+                    console.log(data);
+                    window.location.href = '/training-status-page';
+                })
+                .catch(error => console.error("Error:", error));
 
             // Hide stopwatch container
             stopwatchContainer.classList.add('hidden');
@@ -309,47 +329,120 @@
             if (this.value.startsWith('0') && this.value.length > 1) this.value = this.value.substring(1);
         });
 
-        // polling untuk status aktif latihan
+        // Function untuk update status latihan jika timer sudah habis
+        function updateTimerExpiredStatus() {
+            fetch("/api/update-timer-status", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        timer_expired: true
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Timer status updated:", data);
+                    // Reload training status untuk menampilkan session sudah berakhir
+                    fetchTrainingStatus();
+                })
+                .catch(error => console.error("Error updating timer status:", error));
+        }
+
+        // Function untuk check jika shotmade == attempt dan timer berhenti
+        function checkShotCompletion(data) {
+            if (data && data.shotmade && data.attempt) {
+                // Check jika shotmade == attempt atau lebih
+                if (parseInt(data.shotmade) >= parseInt(data.attempt) && isRunning) {
+                    // shotmade == attempt maka timer automatis stop
+                    stopStopwatch();
+                    alert("Shot target reached! Training complete.");
+
+                    // Submit elapsed time ke server
+                    updateCompletedTrainingTime();
+
+                    // sembunyikan stopwatch container
+                    stopwatchContainer.classList.add('hidden');
+                }
+            }
+        }
+
+        // Function to update server with elapsed time when shots are completed
+        function updateCompletedTrainingTime() {
+            const elapsedSeconds = initialTotalSeconds - totalSeconds;
+            const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+            const remainingSeconds = elapsedSeconds % 60;
+            const elapsedFormatted =
+                `${elapsedMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+
+            fetch("/api/update-training-time", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        duration: elapsedFormatted
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Training time updated:", data);
+                })
+                .catch(error => console.error("Error updating training time:", error));
+        }
+
+        // Polling for active training status
         function fetchTrainingStatus() {
             fetch('/api/training-status')
                 .then(res => res.json())
                 .then(data => {
                     const html = `
-                        <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 mt-6">
-                            <h3 class="text-2xl font-bold mb-4 text-gray-800">Status Sesi Latihan</h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between">
-                                    <span class="font-medium text-gray-700">Lokasi:</span>
-                                    <span class="text-gray-900">${data.location}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="font-medium text-gray-700">Target Attempt:</span>
-                                    <span class="text-gray-900">${data.attempt}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="font-medium text-gray-700">Jumlah Dihitung:</span>
-                                    <span class="text-gray-900">${data.shotmade}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="font-medium text-gray-700">Status:</span>
-                                    ${data.is_active
-                                        ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>`
-                                        : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Selesai</span>`}
-                                </div>
-                            </div>
+                <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 mt-6">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">Status Sesi Latihan</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-700">Lokasi:</span>
+                            <span class="text-gray-900">${data.location}</span>
                         </div>
-                    `;
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-700">Target Attempt:</span>
+                            <span class="text-gray-900">${data.attempt}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-700">Jumlah Dihitung:</span>
+                            <span class="text-gray-900">${data.shotmade}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-gray-700">Status:</span>
+                            ${data.is_active
+                                ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>`
+                                : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Selesai</span>`}
+                        </div>
+                    </div>
+                </div>
+            `;
                     document.getElementById('training-status').innerHTML = html;
+
+                    // If session is not active anymore, hide stopwatch and reset
+                    if (!data.is_active && isRunning) {
+                        stopStopwatch();
+                        stopwatchContainer.classList.add('hidden');
+                    }
+
+                    // Check if we've reached our shot target
+                    if (isRunning) {
+                        checkShotCompletion(data);
+                    }
                 })
                 .catch(() => {
                     document.getElementById('training-status').innerHTML = `
-                        <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6 mt-6 text-center text-gray-500">
-                            Tidak ada sesi aktif.
-                        </div>`;
+                <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6 mt-6 text-center text-gray-500">
+                    Tidak ada sesi aktif.
+                </div>`;
                 });
         }
 
-        // Jalankan polling setiap 2 detik
+        // Run polling every 2 seconds
         setInterval(fetchTrainingStatus, 2000);
         fetchTrainingStatus();
     </script>

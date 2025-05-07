@@ -22,11 +22,24 @@ class OverallShotController extends Controller
         if ($request->filled('filter_date')) {
             try {
                 $date = Carbon::parse($request->filter_date)->format('Y-m-d');
-                $query->whereDate('created_at', $date);
+                $query->whereDate('date', $date);
             } catch (\Exception $e) {
                 // Handle invalid date format
             }
         }
+
+        $currentDate = $request->input('date') ? Carbon::parse($request->input('date')) : Carbon::now();
+        $daysInMonth = $currentDate->daysInMonth;
+        $firstDay = $currentDate->copy()->startOfMonth()->dayOfWeek;
+
+        // Mengambil latihan dari database berdasarkan tanggal
+        $trainings = OverallShot::where('user_id', Auth::user()->id)
+            ->whereMonth('date', $currentDate->month)
+            ->whereYear('date', $currentDate->year)
+            ->get()
+            ->groupBy(function ($training) {
+                return Carbon::parse($training->date)->format('Y-m-d');
+            });
 
         // Apply accuracy filter if provided
         if ($request->filled('filter_accuracy')) {
@@ -57,36 +70,11 @@ class OverallShotController extends Controller
             'overallShot',
             'totalSessions',
             'avgAccuracy',
+            'trainings',
+            'daysInMonth',
+            'firstDay',
+            'currentDate'
         ));
-        // // $shotTraining = ShotTraining::all();
-        // return view('', compact('overallShot'));
-    }
-
-    private function calculateBestDay()
-    {
-        $daysOfWeek = [
-            0 => 'Sunday',
-            1 => 'Monday',
-            2 => 'Tuesday',
-            3 => 'Wednesday',
-            4 => 'Thursday',
-            5 => 'Friday',
-            6 => 'Saturday',
-        ];
-
-        $sessions = OverallShot::selectRaw('DAYOFWEEK(created_at) as day, COUNT(*) as count')
-            ->groupBy('day')
-            ->orderBy('count', 'desc')
-            ->first();
-
-        if ($sessions) {
-            // MySQL's DAYOFWEEK() returns 1 for Sunday, 2 for Monday, etc.
-            // We need to adjust the index to match our array
-            $dayIndex = ($sessions->day - 1) % 7;
-            return $daysOfWeek[$dayIndex];
-        }
-
-        return 'N/A';
     }
 
     /**

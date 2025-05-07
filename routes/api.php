@@ -15,45 +15,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-// Route::post('/sensor/shot-made', function (Request $request) {
-//     $validated = $request->validate([
-//         'sensor_id' => 'required|string',
-//         'value' => 'required|boolean', // true when shot is made
-//     ]);
-
-//     // Find the active training session
-//     $activeTraining = ShotTraining::where('is_active', true)
-//         ->latest()
-//         ->first();
-
-//     if (!$activeTraining) {
-//         return response()->json([
-//             'success' => false,
-//             'message' => 'No active training session found'
-//         ]);
-//     }
-
-//     // Only increment if value is true (shot made) and not reached the target yet
-//     if ($validated['value'] && $activeTraining->shotmade < $activeTraining->attempt) {
-//         $activeTraining->shotmade = $activeTraining->shotmade + 1;
-
-//         // Update accuracy in real-time
-//         if ($activeTraining->attempt > 0) {
-//             $activeTraining->accuracy = ($activeTraining->shotmade / $activeTraining->attempt) * 100;
-//         }
-
-//         $activeTraining->save();
-//     }
-
-//     return response()->json([
-//         'success' => true,
-//         'current_shots' => $activeTraining->shotmade,
-//         'target' => $activeTraining->attempt,
-//         'accuracy' => $activeTraining->accuracy,
-//         'is_complete' => $activeTraining->shotmade >= $activeTraining->attempt
-//     ]);
-// });
-
 
 
 Route::post('/update-training-counter', function (Request $request) {
@@ -66,9 +27,21 @@ Route::post('/update-training-counter', function (Request $request) {
         }
 
         $session->shotmade += 1;
+
+        // Check if we've reached our target
+        if ($session->shotmade >= $session->attempt) {
+            $session->is_active = false;
+            $session->accuracy = ($session->shotmade / $session->attempt) * 100;
+        }
+
         $session->save();
 
-        return response()->json(['message' => 'Shot made counted']);
+        return response()->json([
+            'message' => 'Shot made counted',
+            'shotmade' => $session->shotmade,
+            'attempt' => $session->attempt,
+            'is_active' => $session->is_active
+        ]);
     }
 
     return response()->json(['success' => false], 404);
@@ -80,23 +53,58 @@ Route::post('/finish-training-session', function (Request $request) {
     if (!$session) {
         return response()->json(['success' => false, 'message' => 'Tidak ada sesi aktif'], 404);
     }
-
-    if ($session->shotmade < $session->attempt) {
-        return response()->json(['message' => 'Latihan belum selesai, masih ada attempt tersisa'], 400);
-    }
-
     $session->is_active = false;
     $session->accuracy = ($session->shotmade / $session->attempt) * 100;
     $session->save();
 
-
-
     return response()->json(['message' => 'Sesi latihan diselesaikan']);
+});
+
+Route::post('/update-timer-status', function (Request $request) {
+    $timerExpired = $request->input('timer_expired', false);
+
+    if ($timerExpired) {
+        $session = ShotTraining::where('is_active', true)->latest()->first();
+
+        if ($session) {
+            // akhiri sesi jika timer sudah habis
+            $session->is_active = false;
+            $session->accuracy = $session->attempt > 0 ? ($session->shotmade / $session->attempt) * 100 : 0;
+            $session->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Session ended due to timer expiration',
+                'shotmade' => $session->shotmade,
+                'attempt' => $session->attempt,
+                'accuracy' => $session->accuracy
+            ]);
+        }
+    }
+
+    return response()->json(['success' => false, 'message' => 'No active session or invalid request']);
+});
+
+
+//Melakukan update untuk waktu training (duration)
+Route::post('/update-training-time', function (Request $request) {
+    $duration = $request->input('duration');
+
+    $session = ShotTraining::where('is_active', true)->latest()->first();
+
+    if ($session) {
+        $session->duration = $duration;
+        $session->save();
+
+        return response()->json(['success' => true, 'message' => 'Training time updated']);
+    }
+
+    return response()->json(['success' => false, 'message' => 'No active session found']);
 });
 
 
 
-
+//Menampilkan training yang dilakukan secara realtime dengan sesi yang lagi aktif
 Route::get('/training-status', function () {
     $session = ShotTraining::where('is_active', true)->latest()->first();
 
@@ -110,6 +118,6 @@ Route::get('/training-status', function () {
         'shotmade' => $session->shotmade,
         'accuracy' => $session->accuracy,
         'is_active' => $session->is_active,
-        'duration' => $session->duration // Added duration field
+
     ]);
 });

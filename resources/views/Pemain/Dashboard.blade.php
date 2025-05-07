@@ -1,27 +1,63 @@
 <x-layout>
     <!-- SECTION DESKTOP -->
-    <div class="container mx-auto  py-6 max-w-7xl">
+    <div class="container mx-auto py-6 max-w-7xl">
         <!-- Header Section with Improved Styling -->
         <div class="bg-gradient-to-r from-gray-900 to-black rounded-xl shadow-lg p-6 mb-8">
-            <div class="flex items-center justify-between">
-                <h1 class="text-4xl font-extrabold text-white tracking-tight md:text-5xl lg:text-6xl">
-                    Welcome to <br> <span
-                        class=" bg-gradient-to-r from-blue-400 to-purple-600">MyShotTracker</span>
-                </h1>
-            </div>
-
-            <!-- Quick Stats Section -->
-            <div class="grid grid-cols-2 gap-4 mt-6">
-                <div class="bg-gray-800 rounded-lg p-4 shadow-md">
-                    <p class="text-gray-400 text-sm">Total Sessions</p>
-                    <p class="text-white text-2xl font-bold">{{ $totalSessions ?? 24 }}</p>
+            <div class="flex flex-col md:flex-row items-center justify-between mb-6">
+                <div class="w-full md:w-1/2 mb-4 md:mb-0">
+                    <h1 class="text-4xl font-extrabold text-white tracking-tight md:text-5xl lg:text-6xl">
+                        Welcome to <br> <span class="text-grafik">MyShotTracker</span>
+                    </h1>
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <div class="bg-gray-800 rounded-lg p-4 shadow-md">
+                            <p class="text-gray-400 text-sm">Total Training</p>
+                            <p class="text-white text-2xl font-bold">{{ $totalSessions ?? 0 }}</p>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-4 shadow-md">
+                            <p class="text-gray-400 text-sm">Avg. Accuracy</p>
+                            <p class="text-white text-2xl font-bold">{{ $avgAccuracy ?? '0%' }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-gray-800 rounded-lg p-4 shadow-md">
-                    <p class="text-gray-400 text-sm">Avg. Accuracy</p>
-                    <p class="text-white text-2xl font-bold">{{ $avgAccuracy ?? '67%' }}</p>
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="bg-gray-800 text-white rounded-lg p-6 w-full max-w-md">
+                        <div class="flex justify-between mb-4">
+                            <a href="/index?date={{ $currentDate->copy()->subMonth()->format('Y-m') }}"
+                                class="px-4 py-2 bg-blue-500 text-white rounded">  <|  </a>
+                                    <h2 class="text-xl font-bold text-center">{{ $currentDate->format('F Y') }}</h2>
+                                    <a href="/index?date={{ $currentDate->copy()->addMonth()->format('Y-m') }}"
+                                        class="px-4 py-2 bg-blue-500 text-white rounded"> |> </a>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 mt-4 text-center">
+                            @foreach (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $day)
+                                <div class="font-semibold">{{ $day }}</div>
+                            @endforeach
+                            @for ($i = 0; $i < $firstDay; $i++)
+                                <div></div>
+                            @endfor
+                            @for ($day = 1; $day <= $daysInMonth; $day++)
+                                @php
+                                    $dateString =
+                                        $currentDate->format('Y-m') . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                                    $hasTraining = isset($trainings[$dateString]);
+                                @endphp
+                                <div class="relative p-2 rounded cursor-pointer {{ $hasTraining ? 'hover:bg-blue-700' : 'hover:bg-blue-200' }}
+                                     {{ request('filter_date') == $dateString ? 'bg-blue-600' : '' }}"
+                                    onclick="showTrainings('{{ $dateString }}')">
+                                    <span>{{ $day }}</span>
+                                    @if ($hasTraining)
+                                        <div class="flex justify-center mt-1">
+                                            <span class="block w-2 h-2 bg-green-500 rounded-full"></span>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
 
         <!-- My History Section with Improved Filter -->
         <div class="rounded-xl shadow-lg p-6 mb-8">
@@ -39,6 +75,7 @@
                     </h1>
                 </div>
 
+
                 <!-- Filter Form - Added form tag with method and action -->
                 <form id="filterForm" method="GET" action="{{ route('Overall.index') }}" class="w-full md:w-auto">
                     <div class="flex flex-wrap items-center gap-3 md:gap-4">
@@ -53,9 +90,9 @@
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <input datepicker name="filter_date" id="default-datepicker" type="text"
+                                <input readonly name="filter_date" id="default-datepicker" type="text"
                                     class="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
-                                    placeholder="Select date" value="{{ request('filter_date') }}">
+                                    placeholder="Select Date on Calendar" value="{{ request('filter_date') }}">
                             </div>
                         </div>
 
@@ -65,13 +102,15 @@
                             <select name="filter_accuracy"
                                 class="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
                                 onchange="document.getElementById('filterForm').submit()">
-                                <option value="" {{ request('filter_accuracy') == '' ? 'selected' : '' }}>All
+                                <option value="" {{ request('filter_accuracy') == '' ? 'selected' : '' }}>Select Accuracy
                                 </option>
-                                <option value="high" {{ request('filter_accuracy') == 'high' ? 'selected' : '' }}>High
+                                <option value="high" {{ request('filter_accuracy') == 'high' ? 'selected' : '' }}>
+                                    High
                                     (> 75%)</option>
                                 <option value="medium" {{ request('filter_accuracy') == 'medium' ? 'selected' : '' }}>
                                     Medium (50-75%)</option>
-                                <option value="low" {{ request('filter_accuracy') == 'low' ? 'selected' : '' }}>Low (
+                                <option value="low" {{ request('filter_accuracy') == 'low' ? 'selected' : '' }}>Low
+                                    (
                                     < 50%)</option>
                             </select>
                         </div>
@@ -89,12 +128,19 @@
                         </a>
                     </div>
 
+                    <!-- Hidden field for date if selected from calendar -->
+                    @if (request()->has('date'))
+                        <input type="hidden" name="date" value="{{ request('date') }}">
+                    @endif
+
                     <!-- Keep current page when filtering -->
                     @if (request()->has('page'))
                         <input type="hidden" name="page" value="{{ request('page') }}">
                     @endif
                 </form>
             </div>
+
+
 
             <!-- Cards Section with Improved Styling -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -108,7 +154,7 @@
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                         <p class="text-xl text-gray-400 font-medium">No training sessions found with these filters</p>
-                        <a href="{{ route('training.index') }}"
+                        <a href="{{ route('Overall.index') }}"
                             class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center">
                             Reset Filters
                         </a>
@@ -134,9 +180,9 @@
                     altInput: true,
                     altFormat: "F j, Y",
                     theme: "dark",
-                    onChange: function(selectedDates, dateStr, instance) {
-                        // Opsional: auto-submit form saat tanggal dipilih
-                        // document.getElementById('filterForm').submit();
+                    onChange: function(selectedDates, dateStr) {
+                        // Auto submit when date is selected
+                        document.getElementById('filterForm').submit();
                     }
                 });
             }
@@ -149,5 +195,17 @@
                 });
             }
         });
+
+        // Function to show trainings for a specific date
+        function showTrainings(dateString) {
+            // Set the filter_date value in the form
+            const datepicker = document.getElementById('default-datepicker');
+            if (datepicker) {
+                datepicker.value = dateString;
+            }
+
+            // Submit the form to filter results
+            document.getElementById('filterForm').submit();
+        }
     </script>
 </x-layout>

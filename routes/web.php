@@ -38,6 +38,7 @@ Route::get('/index', [OverallShotController::class, 'index'])->name('Overall.ind
 Route::post('/finish-training', [OverallShotController::class, 'store']);
 
 
+
 Route::get('/create', [ShotTrainingController::class, 'create'])->name('training.create');
 Route::post('/start-training', [ShotTrainingController::class, 'store'])->name('training.store');
 Route::post('/update-overall', [shotTrainingController::class, 'updateData'])->name('training.updateData');
